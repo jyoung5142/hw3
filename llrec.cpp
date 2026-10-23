@@ -16,6 +16,7 @@ void llpivot(Node *&head, Node *&smaller, Node *&larger, int pivot){
     Node* curr = head;
     llpivot(head->next, smaller, larger, pivot);
     if(curr->val <= pivot){
+        curr->next = smaller;
         smaller = curr;
     }
     else{
