@@ -2,6 +2,7 @@
 #define HEAP_H
 #include <functional>
 #include <stdexcept>
+#include <vector>
 
 template <typename T, typename PComparator = std::less<T> >
 class Heap
@@ -61,7 +62,9 @@ public:
 
 private:
   /// Add whatever helper functions and data members you need below
-
+  std::vector<T> data;
+  int m;
+  PComparator comp;
 
 
 
@@ -69,6 +72,34 @@ private:
 
 // Add implementation of member functions here
 
+// Constructor
+template <typename T, typename PComparator>
+Heap<T,PComparator>::Heap(int m, PComparator c)
+    : m(m), comp(c) {
+    if(m < 2) {
+        throw std::invalid_argument("m must be >= 2");
+    }
+}
+
+
+// Destructor
+template <typename T, typename PComparator>
+Heap<T,PComparator>::~Heap() {
+}
+
+
+// Check if heap is empty
+template <typename T, typename PComparator>
+bool Heap<T,PComparator>::empty() const {
+    return data.empty();
+}
+
+
+// Return heap size
+template <typename T, typename PComparator>
+size_t Heap<T,PComparator>::size() const {
+    return data.size();
+}
 
 // We will start top() for you to handle the case of 
 // calling top on an empty heap
@@ -81,16 +112,36 @@ T const & Heap<T,PComparator>::top() const
     // ================================
     // throw the appropriate exception
     // ================================
-
+    throw std::underflow_error("Heap is empty");
 
   }
   // If we get here we know the heap has at least 1 item
   // Add code to return the top element
-
-
-
+  return data[0];
 }
 
+// Insert an item into the heap
+template <typename T, typename PComparator>
+void Heap<T,PComparator>::push(const T& item) {
+    // Add item to end
+    data.push_back(item);
+
+    // Get index of new item
+    size_t i = data.size() - 1;
+
+    // Bubble up
+    while(i > 0) {
+        size_t parent = (i - 1) / m;
+
+        if(comp(data[i], data[parent])) {
+            std::swap(data[i], data[parent]);
+            i = parent;
+        }
+        else {
+            break;
+        }
+    }
+}
 
 // We will start pop() for you to handle the case of 
 // calling top on an empty heap
@@ -101,12 +152,33 @@ void Heap<T,PComparator>::pop()
     // ================================
     // throw the appropriate exception
     // ================================
-
+    throw std::underflow_error("Heap is empty");
 
   }
+  data[0] = data.back();
+  data.pop_back();
+  if(empty()) {
+      return;
+  }
+  size_t i = 0;
 
+  // Bubble down
+  while(true) {
+      size_t best = i;
 
-
+      for(int j = 1; j <= m; j++) {
+          size_t child = m * i + j;
+          if(child < data.size() && comp(data[child], data[best])) {
+              best = child;
+          }
+      }
+      //done
+      if(best == i) {
+          break;
+      }
+      std::swap(data[i], data[best]);
+      i = best;
+  }
 }
 
 
